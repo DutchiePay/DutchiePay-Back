@@ -29,6 +29,12 @@ public class Share extends Auditing {
     @Column(nullable = false, length = 1000)
     private String contents;
 
+    // 상품
+    private String goods;
+
+    // 가격
+    private int price;
+
     // 카테고리
     @Column(nullable = false, length = 10)
     private String category;
