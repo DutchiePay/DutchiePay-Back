@@ -63,15 +63,14 @@ public class CommunityController {
     @PostMapping("/trading")
     public ResponseEntity<?> createSharePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                              @RequestBody CreateSharePostRequestDto request) {
-        communityService.createSharePost(userDetails.getUser(), request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(communityService.createSharePost(userDetails.getUser(), request));
     }
 
     @Operation(summary = "자유게시판 게시글 작성(구현 중)")
     @PostMapping("/free")
     public ResponseEntity<?> createFreePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                             @RequestBody CreateFreePostRequestDto request) {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(communityService.createFreePost(userDetails.getUser(), request));
     }
 
     @Operation(summary = "게시글 신고")
