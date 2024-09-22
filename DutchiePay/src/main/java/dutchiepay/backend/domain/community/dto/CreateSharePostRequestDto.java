@@ -14,5 +14,5 @@ public class CreateSharePostRequestDto {
     private String latitude;
     private String longitude;
     private String goods;
-    private String images;
+    private String[] images;
 }
