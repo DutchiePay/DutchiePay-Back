@@ -464,7 +464,7 @@ class ProfileRepositoryTest {
 
         // 마트/배달 게시글
         Share sharePost1 = Share.builder()
-                .userId(user)
+                .user(user)
                 .title("테스트 마트/배달 게시글1")
                 .contents("테스트 마트/배달 게시글 내용1")
                 .category("배달")
