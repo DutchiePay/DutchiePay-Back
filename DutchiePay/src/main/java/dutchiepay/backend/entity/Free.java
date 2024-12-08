@@ -1,5 +1,6 @@
 package dutchiepay.backend.entity;
 
+import dutchiepay.backend.domain.community.dto.UpdateFreeRequestDto;
 import dutchiepay.backend.global.config.Auditing;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,5 +35,15 @@ public class Free extends Auditing {
 
     @Column(nullable = false)
     private int hits;
+
+    @Column(nullable = false)
+    private String description;
+
+    public void updateFree(UpdateFreeRequestDto dto) {
+        this.title = dto.getTitle();
+        this.contents = dto.getContent();
+        this.category = dto.getCategory();
+        this.postImg = dto.getThumbnail();
+    }
 
 }
