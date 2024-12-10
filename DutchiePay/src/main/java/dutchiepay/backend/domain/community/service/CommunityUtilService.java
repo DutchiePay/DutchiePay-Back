@@ -12,6 +12,8 @@ import dutchiepay.backend.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CommunityUtilService {
@@ -64,6 +66,16 @@ public class CommunityUtilService {
     public HotAndRecommendsResponseDto getHotAndRecommendPosts(String category) {
         return HotAndRecommendsResponseDto.toDto(qFreeRepository.getHotPosts(),
                 qFreeRepository.getRecommendsPosts(category));
+    }
+
+    // 원댓 목록 조회
+    public CommentResponseDto getComments(Long freeId, Long cursor, int limit) {
+        return qFreeRepository.getComments(freeId, cursor, limit);
+    }
+
+    // 답댓 목록 조회
+    public List<ReCommentResponseDto> getReComments(Long commentId, String type) {
+        return qFreeRepository.getReComments(commentId, type);
     }
 
     // 댓글 작성 시 Comment 객체 생성 후 저장

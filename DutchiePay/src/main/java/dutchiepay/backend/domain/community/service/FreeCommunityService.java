@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 
 import static dutchiepay.backend.domain.community.service.CommunityUtilService.*;
@@ -97,6 +98,27 @@ public class FreeCommunityService {
     }
 
     /**
+     * 원댓글 조회
+     * @param freeId 조회할 게시글 Id
+     * @param cursor 다음부터 넘겨줄 댓글 Id
+     * @param limit 넘길 댓글 개수
+     * @return 댓글 목록 dto
+     */
+    public CommentResponseDto getComments(Long freeId, Long cursor, int limit) {
+        return communityUtilService.getComments(freeId, cursor, limit);
+    }
+
+    /**
+     * 답글 조회
+     * @param commentId 원댓글 Id
+     * @param type 처음 5개인지, 이후 전부인지
+     * @return 답글 목록 dto
+     */
+    public List<ReCommentResponseDto> getReComments(Long commentId, String type) {
+        return communityUtilService.getReComments(commentId, type);
+    }
+
+    /**
      * 댓글 작성
      * @param user 댓글을 작성자
      * @param commentRequestDto 댓글 내용이 담긴 dto
@@ -135,5 +157,4 @@ public class FreeCommunityService {
 
         comment.delete();
     }
-
 }

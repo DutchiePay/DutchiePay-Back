@@ -18,6 +18,7 @@ public enum CommunityErrorCode implements StatusCode {
     UNMATCHED_WRITER(HttpStatus.BAD_REQUEST, "작성자가 일치하지 않습니다."),
     INSUFFICIENT_LENGTH(HttpStatus.BAD_REQUEST, "최소 글자수를 충족하지 않았습니다."),
     ILLEGAL_FILTER(HttpStatus.BAD_REQUEST, "필터 값이 유효하지 않습니다."),
+    ILLEGAL_TYPE(HttpStatus.BAD_REQUEST, "타입 값이 유효하지 않습니다."),
     /**
      * 404 Not Found
      */
