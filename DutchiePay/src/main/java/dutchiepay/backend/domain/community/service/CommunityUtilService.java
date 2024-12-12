@@ -2,6 +2,7 @@ package dutchiepay.backend.domain.community.service;
 
 import dutchiepay.backend.domain.commerce.repository.CommentRepository;
 import dutchiepay.backend.domain.commerce.repository.FreeRepository;
+import dutchiepay.backend.domain.community.FreeCategory;
 import dutchiepay.backend.domain.community.dto.*;
 import dutchiepay.backend.domain.community.exception.CommunityErrorCode;
 import dutchiepay.backend.domain.community.exception.CommunityException;
@@ -38,7 +39,7 @@ public class CommunityUtilService {
                 .user(user)
                 .title(createFreeRequestDto.getTitle())
                 .contents(createFreeRequestDto.getContent())
-                .category(createFreeRequestDto.getCategory())
+                .category(FreeCategory.findByString(createFreeRequestDto.getCategory()).getType())
                 .thumbnail(createFreeRequestDto.getThumbnail())
                 .images(String.join(",", createFreeRequestDto.getImages()))
                 .description(description.substring(0, Math.min(description.length(), 100)))
