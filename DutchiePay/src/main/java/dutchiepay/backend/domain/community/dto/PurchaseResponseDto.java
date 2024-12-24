@@ -1,13 +1,12 @@
 package dutchiepay.backend.domain.community.dto;
 
-import dutchiepay.backend.entity.Purchase;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
+@AllArgsConstructor
 public class PurchaseResponseDto {
     private Long writerId;
     private String writer;
@@ -24,22 +23,4 @@ public class PurchaseResponseDto {
     private LocalDateTime createdAt;
     private Integer hits;
 
-    public static PurchaseResponseDto toDto(Purchase purchase) {
-        return PurchaseResponseDto.builder()
-                .writerId(purchase.getUser().getUserId())
-                .writer(purchase.getUser().getNickname())
-                .writerProfileImage(purchase.getUser().getProfileImg())
-                .title(purchase.getTitle())
-                .category(purchase.getPrice() == -1? "share" : "trade")
-                .contents(purchase.getContents())
-                .goods(purchase.getGoods())
-                .price(purchase.getPrice())
-                .meetingPlace(purchase.getMeetingPlace())
-                .latitude(purchase.getLatitude())
-                .longitude(purchase.getLongitude())
-                .state(purchase.getState())
-                .createdAt(purchase.getCreatedAt())
-                .hits(purchase.getHits())
-                .build();
-    }
 }

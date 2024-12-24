@@ -75,7 +75,7 @@ public class CommunityUtilService {
     // 댓글 작성 시 Comment 객체 생성 후 저장
     public Comment createComment(User user, CommentCreateRequestDto commentRequestDto) {
         // 답글이면 검증 수행
-        if (commentRequestDto.getRootCommentId() != null && commentRequestDto.getMentionedId() != null) {
+        if (commentRequestDto.getRootCommentId() != null || commentRequestDto.getMentionedId() != null) {
             validateCommentCreateRequest(commentRequestDto);
         }
         return commentRepository.save(
@@ -86,6 +86,9 @@ public class CommunityUtilService {
     }
 
     private void validateCommentCreateRequest(CommentCreateRequestDto commentRequestDto) {
+        // rootCommentId나 mentionedId가 null이면 exception 발생
+        if (commentRequestDto.getRootCommentId() == null || commentRequestDto.getMentionedId() == null)
+            throw new CommunityException(CommunityErrorCode.ILLEGAL_ARGUMENT);
         // root 댓글과 mentioned 댓글을 찾아서 deleteAt이 null인지 확인 -> 삭제된 댓글이면 exception 발생
         // root Comment나 mentioned Comment의 freeId와 현재 freeId가 다르면 exception 발생
         Comment rootComment = findCommentById(commentRequestDto.getRootCommentId());

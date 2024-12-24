@@ -70,11 +70,12 @@ public class QPurchaseRepositoryImpl {
 
     public PurchaseResponseDto getPurchase(Long purchaseId) {
 
-        PurchaseResponseDto result = jpaQueryFactory.select(Projections.fields(PurchaseResponseDto.class,
-                        user.userId,
-                        user.nickname,
-                        user.profileImg,
+        PurchaseResponseDto result = jpaQueryFactory.select(Projections.constructor(PurchaseResponseDto.class,
+                        user.userId.as("writerId"),
+                        user.nickname.as("writer"),
+                        user.profileImg.as("writerProfileImage"),
                         purchase.title,
+                        purchase.category,
                         purchase.contents,
                         purchase.goods,
                         purchase.price,

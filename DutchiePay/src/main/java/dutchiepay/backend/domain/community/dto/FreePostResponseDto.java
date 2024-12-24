@@ -1,14 +1,12 @@
 package dutchiepay.backend.domain.community.dto;
 
-import dutchiepay.backend.entity.Free;
-import dutchiepay.backend.entity.User;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
+@AllArgsConstructor
 public class FreePostResponseDto {
 
     private Long writerId;
@@ -21,18 +19,4 @@ public class FreePostResponseDto {
     private Long commentsCount;
     private Integer hits;
 
-    public static FreePostResponseDto toDto(User user, Free free, Long count) {
-        return FreePostResponseDto.builder()
-                .writerId(user.getUserId())
-                .writer(user.getNickname())
-                .writerProfileImage(user.getProfileImg())
-                .title(free.getTitle())
-                .content(free.getContents())
-                .createdAt(free.getCreatedAt())
-                .category(free.getCategory())
-                .commentsCount(count)
-                .hits(free.getHits())
-                .build();
-
-    }
 }

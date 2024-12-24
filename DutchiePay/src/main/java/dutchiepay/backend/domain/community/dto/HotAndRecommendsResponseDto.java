@@ -1,10 +1,14 @@
 package dutchiepay.backend.domain.community.dto;
 
+import com.querydsl.core.Tuple;
 import dutchiepay.backend.entity.Free;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
+
+import static dutchiepay.backend.entity.QFree.free;
+import static dutchiepay.backend.entity.QUser.user;
 
 @Getter
 @Builder
@@ -20,15 +24,15 @@ public class HotAndRecommendsResponseDto {
         private String writerProfileImg;
         private String writer;
         private String title;
-        private Integer commentCount;
+        private Long commentCount;
 
-        public static Posts toDto(Free free, Long count) {
+        public static Posts toDto(Tuple result, Long count) {
             return Posts.builder()
-                    .freeId(free.getFreeId())
-                    .writerProfileImg(free.getUser().getProfileImg())
-                    .writer(free.getUser().getNickname())
-                    .title(free.getTitle())
-                    .commentCount(Math.toIntExact(count))
+                    .freeId(result.get(free.freeId))
+                    .writerProfileImg(result.get(user.profileImg))
+                    .writer(result.get(user.nickname))
+                    .title(result.get(free.title))
+                    .commentCount(count)
                     .build();
         }
     }

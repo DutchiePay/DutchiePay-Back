@@ -4,9 +4,6 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -31,16 +28,19 @@ public class QFreeRepositoryImpl implements QFreeRepository {
 
     QFree free = QFree.free;
     QComment comment = QComment.comment;
+    QUser user = QUser.user;
 
     @Override
     public FreeListResponseDto getFreeLists(String category, String filter, String word, int limit, Long cursor) {
         // 커서 초기화
         if (cursor == null) cursor = Long.MAX_VALUE;
+        Long nowCommentsCount = null;
 
         // 기본 select, from 문에 조건 추가
         JPAQuery<Free> query = jpaQueryFactory
                 .selectFrom(free)
-                .leftJoin(comment).on(comment.free.eq(free))
+                .leftJoin(comment).on(comment.free.eq(free), comment.deletedAt.isNull())
+                .where(free.deletedAt.isNull())
                 .groupBy(free);
 
         // category가 있으면 검색 조건에 category 추가
@@ -63,7 +63,7 @@ public class QFreeRepositoryImpl implements QFreeRepository {
             case "comment":
                 orderSpecifier = new OrderSpecifier[]{comment.count().desc(), free.freeId.desc()};
                 if (cursor < Long.MAX_VALUE) {
-                    Long nowCommentsCount = jpaQueryFactory.
+                    nowCommentsCount = jpaQueryFactory.
                             select(comment.count())
                             .from(comment)
                             .join(comment.free, free)
@@ -100,60 +100,82 @@ public class QFreeRepositoryImpl implements QFreeRepository {
         List<Free> posts = query.fetch();
         Long nextCursor = posts.size() > limit ? posts.get(limit).getFreeId() : null;
 
+        Long finalNowCommentsCount = nowCommentsCount;
         return FreeListResponseDto.toDto(posts.stream().map(free ->
-                        FreeListResponseDto.FreeList.toDto(free, ChronoUtil.timesAgo(free.getCreatedAt()), countComments(free)))
+                        FreeListResponseDto.FreeList.toDto(free, ChronoUtil.timesAgo(free.getCreatedAt()), finalNowCommentsCount))
                 .collect(Collectors.toList()), nextCursor);
     }
 
     @Override
     public FreePostResponseDto getFreePost(Long freeId) {
-        Free result = jpaQueryFactory
-                .selectFrom(free)
+        FreePostResponseDto result = jpaQueryFactory
+                .select(Projections.constructor(FreePostResponseDto.class,
+                        user.userId.as("writerId"),
+                        user.nickname.as("writer"),
+                        user.profileImg.as("writerProfileImage"),
+                        free.title,
+                        free.contents,
+                        free.createdAt,
+                        free.category,
+                        ExpressionUtils.as(countComments(freeId), "commentsCount"),
+                        free.hits))
+                .from(free).
+                leftJoin(free.user, user)
                 .where(free.freeId.eq(freeId),
                         free.deletedAt.isNull())
                 .fetchFirst();
 
         if (result == null) throw new CommunityException(CommunityErrorCode.CANNOT_FOUND_POST);
 
-        return FreePostResponseDto.toDto(result.getUser(), result, countComments(result));
+        return result;
     }
 
     @Override
     public List<HotAndRecommendsResponseDto.Posts> getHotPosts() {
 
         return jpaQueryFactory
-                .selectFrom(free)
+                .select(free.freeId,
+                        free.user.profileImg.as("writerProfileImg"),
+                        free.user.nickname.as("writer"),
+                        free.title)
+                .from(free)
+                .leftJoin(free.user, user)
                 .where(free.createdAt.goe(LocalDateTime.now().minusDays(7)),
                         free.deletedAt.isNull())
                 .orderBy(free.hits.desc())
                 .limit(5)
                 .fetch()
                 .stream()
-                .map(free -> HotAndRecommendsResponseDto.Posts.toDto(free, countComments(free)))
+                .map(f -> HotAndRecommendsResponseDto.Posts.toDto(f, countComments(f.get(free.freeId)).fetchFirst()))
                 .toList();
     }
 
     @Override
     public List<HotAndRecommendsResponseDto.Posts> getRecommendsPosts(String category) {
+
         return jpaQueryFactory
-                .selectFrom(free)
+                .select(free.freeId,
+                        free.user.profileImg.as("writerProfileImg"),
+                        free.user.nickname.as("writer"),
+                        free.title)
+                .from(free)
+                .leftJoin(free.user, user)
                 .where(free.category.eq(category),
                         free.deletedAt.isNull())
                 .orderBy(free.createdAt.desc())
                 .limit(5)
                 .fetch()
                 .stream()
-                .map(free -> HotAndRecommendsResponseDto.Posts.toDto(free, countComments(free)))
+                .map(f -> HotAndRecommendsResponseDto.Posts.toDto(f, countComments(f.get(free.freeId)).fetchFirst()))
                 .toList();
     }
 
-    private Long countComments(Free free) {
+    private JPAQuery<Long> countComments(Long freeId) {
         return jpaQueryFactory
                 .select(comment.count())
                 .from(comment)
-                .where(comment.free.eq(free),
-                        comment.deletedAt.isNull())
-                .fetchFirst();
+                .where(comment.free.freeId.eq(freeId),
+                        comment.deletedAt.isNull());
     }
 
     @Override
