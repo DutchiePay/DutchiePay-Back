@@ -10,6 +10,10 @@ https://www.dutchie-pay.site/
 
 2024.09.01 ~ 2025.01.19 - 개발
 
+## 프로젝트 아키텍쳐
+![더취페이](https://github.com/user-attachments/assets/1779ec53-49ad-4c0e-b583-ff242e854dac)
+
+
 ## 🛠️ 개발 환경
 ![](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=java&logoColor=white)
 ![](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
